@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Botwizer OOP Principles – Final Project Presentation</title>
+  <meta name="description" content="A visual walkthrough of the four OOP pillars — Inheritance, Polymorphism, Abstraction, and Encapsulation — demonstrated through the Botwizer Instagram Automation project." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #0a0e1a;
+      --bg-card: #0f1629;
+      --bg-glass: rgba(255,255,255,0.04);
+      --border-glass: rgba(255,255,255,0.08);
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-orange: #f59e0b;
+      --accent-pink: #ec4899;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+
+      /* Pillar colors */
+      --abs-color: #8b5cf6;
+      --inh-color: #3b82f6;
+      --pol-color: #10b981;
+      --enc-color: #f59e0b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ── Slide Container ─────────────────────────── */
+    .slide-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 60px;
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+    }
+
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+
+    /* ── Background Grid ─────────────────────────── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      pointer-events: none;
+      animation: orb-float 8s ease-in-out infinite;
+    }
+
+    .bg-orb-1 { width: 500px; height: 500px; background: var(--accent-blue); top: -100px; right: -100px; }
+    .bg-orb-2 { width: 400px; height: 400px; background: var(--accent-purple); bottom: -100px; left: -100px; animation-delay: -4s; }
+
+    @keyframes orb-float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* ── Navigation ──────────────────────────────── */
+    .nav-bar {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15,22,41,0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 100px;
+      padding: 12px 24px;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      background: none;
+      border: 1px solid var(--border-glass);
+      color: var(--text-primary);
+      padding: 8px 20px;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      letter-spacing: 0.03em;
+    }
+
+    .nav-btn:hover { background: var(--bg-glass); border-color: var(--accent-blue); color: var(--accent-blue); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .slide-counter {
+      font-size: 13px;
+      color: var(--text-secondary);
+      min-width: 70px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .dot-nav {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .dot.active {
+      width: 20px;
+      border-radius: 3px;
+      background: var(--accent-blue);
+    }
+
+    /* ── Progress Bar ────────────────────────────── */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+      transition: width 0.4s ease;
+      z-index: 100;
+    }
+
+    /* ── Slide: TITLE ────────────────────────────── */
+    #slide-0 { text-align: center; gap: 20px; }
+
+    .title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      animation: fade-in 0.8s ease 0.2s both;
+    }
+
+    .title-main {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 900;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fade-in 0.8s ease 0.4s both;
+    }
+
+    .title-sub {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.6;
+      animation: fade-in 0.8s ease 0.6s both;
+    }
+
+    .title-pillars {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fade-in 0.8s ease 0.8s both;
+      margin-top: 8px;
+    }
+
+    .pillar-badge {
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border: 1px solid;
+    }
+
+    .pillar-abs { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.4); color: #a78bfa; }
+    .pillar-inh { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.4); color: #60a5fa; }
+    .pillar-pol { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.4); color: #34d399; }
+    .pillar-enc { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.4); color: #fbbf24; }
+
+    .title-meta {
+      display: flex;
+      gap: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+      animation: fade-in 0.8s ease 1s both;
+    }
+
+    .title-meta span { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Slide: OVERVIEW ─────────────────────────── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .overview-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .overview-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overview-card.abs::before { background: radial-gradient(circle at 20% 20%, rgba(139,92,246,0.15) 0%, transparent 60%); }
+    .overview-card.inh::before { background: radial-gradient(circle at 20% 20%, rgba(59,130,246,0.15) 0%, transparent 60%); }
+    .overview-card.pol::before { background: radial-gradient(circle at 20% 20%, rgba(16,185,129,0.15) 0%, transparent 60%); }
+    .overview-card.enc::before { background: radial-gradient(circle at 20% 20%, rgba(245,158,11,0.15) 0%, transparent 60%); }
+
+    .overview-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.15); }
+    .overview-card:hover::before { opacity: 1; }
+
+    .ov-icon { font-size: 36px; margin-bottom: 12px; }
+    .ov-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .ov-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .ov-file { font-size: 11px; color: var(--text-muted); margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Section Slides ──────────────────────────── */
+    .section-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      padding: 5px 14px;
+      margin-bottom: 12px;
+      border: 1px solid;
+    }
+
+    .section-label.abs { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.3); color: #a78bfa; }
+    .section-label.inh { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #60a5fa; }
+    .section-label.pol { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: #34d399; }
+    .section-label.enc { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #fbbf24; }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .section-title.abs { background: linear-gradient(135deg, #fff, var(--abs-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .section-title.inh { background: linear-gradient(135deg, #fff, var(--inh-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .section-title.pol { background: linear-gradient(135deg, #fff, var(--pol-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .section-title.enc { background: linear-gradient(135deg, #fff, var(--enc-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .section-subtitle { font-size: 15px; color: var(--text-secondary); margin-top: 8px; }
+
+    /* ── Two-column Layout ───────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      max-width: 1100px;
+      align-items: start;
+    }
+
+    /* ── Code Block ──────────────────────────────── */
+    .code-panel {
+      background: #0d1117;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .code-dots { display: flex; gap: 6px; }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-dot-r { background: #ff5f57; }
+    .code-dot-y { background: #ffbd2e; }
+    .code-dot-g { background: #28c840; }
+    .code-filename { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+    .code-body { padding: 20px; overflow-x: auto; max-height: 360px; overflow-y: auto; }
+
+    .code-body::-webkit-scrollbar { width: 4px; height: 4px; }
+    .code-body::-webkit-scrollbar-track { background: transparent; }
+    .code-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    /* Syntax Colors */
+    .kw { color: #ff7b72; } /* keyword */
+    .fn { color: #d2a8ff; } /* function/method */
+    .cl { color: #79c0ff; } /* class */
+    .st { color: #a5d6ff; } /* string */
+    .cm { color: #8b949e; font-style: italic; } /* comment */
+    .dt { color: #ffa657; } /* decorator/special */
+    .bl { color: #56d364; } /* boolean/return */
+    .nm { color: #f8c555; } /* number */
+    .selfkw { color: #e3b341; } /* self */
+
+    pre { white-space: pre; }
+
+    /* ── Info Panel ──────────────────────────────── */
+    .info-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .info-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .info-card.abs::before { background: var(--abs-color); }
+    .info-card.inh::before { background: var(--inh-color); }
+    .info-card.pol::before { background: var(--pol-color); }
+    .info-card.enc::before { background: var(--enc-color); }
+
+    .info-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-card-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .info-card-body strong { color: var(--text-primary); }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid;
+    }
+
+    .tag.abs { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.35); color: #a78bfa; }
+    .tag.inh { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.35); color: #60a5fa; }
+    .tag.pol { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.35); color: #34d399; }
+    .tag.enc { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); color: #fbbf24; }
+
+    /* ── Diagram Panel ───────────────────────────── */
+    .diagram-box {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .diag-class {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 14px 28px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .diag-class-name { font-size: 15px; font-weight: 700; }
+    .diag-class-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .diag-class-method { font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); }
+
+    .diag-arrow {
+      width: 2px;
+      height: 28px;
+      background: var(--text-muted);
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .diag-arrow::after {
+      content: '▼';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .diag-row { display: flex; gap: 16px; }
+
+    .diag-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .diag-h-line {
+      height: 2px;
+      background: var(--text-muted);
+      width: 100%;
+      margin-top: 28px;
+    }
+
+    /* ── Summary Slide ───────────────────────────── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .summary-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 24px 18px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .summary-card:hover { transform: translateY(-6px); }
+
+    .summary-icon { font-size: 40px; margin-bottom: 12px; }
+    .summary-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .summary-key { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-top: 8px; }
+
+    .summary-card.abs { border-color: rgba(139,92,246,0.3); }
+    .summary-card.inh { border-color: rgba(59,130,246,0.3); }
+    .summary-card.pol { border-color: rgba(16,185,129,0.3); }
+    .summary-card.enc { border-color: rgba(245,158,11,0.3); }
+
+    /* ── Keyframe Animations ─────────────────────── */
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Slide-in content ────────────────────────── */
+    .slide.active .section-header,
+    .slide.active .two-col,
+    .slide.active .overview-grid,
+    .slide.active .summary-grid {
+      animation: fade-in 0.5s ease 0.1s both;
+    }
+
+    /* ── Keyboard Hint ───────────────────────────── */
+    .key-hint {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+    }
+
+    .key-hint kbd {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+    }
+
+    /* ── Repo Info ───────────────────────────────── */
+    .repo-strip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 10px 24px;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(10,14,26,0.8);
+      border-bottom: 1px solid var(--border-glass);
+      backdrop-filter: blur(10px);
+      z-index: 99;
+    }
+
+    .repo-strip a { color: var(--accent-blue); text-decoration: none; }
+    .repo-strip a:hover { text-decoration: underline; }
+    .repo-divider { color: var(--text-muted); opacity: 0.3; }
+
+    /* Highlight animated line */
+    .highlight-line {
+      background: rgba(255, 255, 100, 0.07);
+      border-left: 3px solid #fbbf24;
+      padding-left: 6px;
+      margin-left: -6px;
+      display: block;
+      border-radius: 0 3px 3px 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-grid"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Repo strip -->
+<div class="repo-strip">
+  <span>📁 <strong>TechyElle / botwizer</strong></span>
+  <span class="repo-divider">|</span>
+  <span>Original: <a href="https://github.com/DevGlitch/botwizer" target="_blank">DevGlitch/botwizer</a></span>
+  <span class="repo-divider">|</span>
+  <span>Fork: <a href="https://github.com/TechyElle/botwizer" target="_blank">TechyElle/botwizer</a></span>
+  <span class="repo-divider">|</span>
+  <span>🐍 Python 3.8+ • OOP Study</span>
+</div>
+
+<!-- Keyboard hint -->
+<div class="key-hint">
+  <kbd>←</kbd><kbd>→</kbd> or click buttons to navigate
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 0: TITLE                                -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide active" id="slide-0">
+  <div class="title-badge">🤖 Final Project Presentation</div>
+  <h1 class="title-main">Botwizer<br/>OOP Principles</h1>
+  <p class="title-sub">
+    An in-depth walkthrough of <strong>Abstraction, Inheritance, Polymorphism,</strong> and <strong>Encapsulation</strong>
+    through a real Python Instagram automation CLI project.
+  </p>
+  <div class="title-pillars">
+    <span class="pillar-badge pillar-abs">🔮 Abstraction</span>
+    <span class="pillar-badge pillar-inh">🧬 Inheritance</span>
+    <span class="pillar-badge pillar-pol">🔄 Polymorphism</span>
+    <span class="pillar-badge pillar-enc">🔒 Encapsulation</span>
+  </div>
+  <div class="title-meta">
+    <span>📂 <code>oop_demo/botwizer_automation/</code></span>
+    <span>👤 TechyElle</span>
+    <span>📅 June 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 1: OVERVIEW                             -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-1">
+  <div class="section-header">
+    <div class="section-label inh">📋 What We Will Cover</div>
+    <h2 class="section-title inh">Four OOP Pillars in Botwizer</h2>
+    <p class="section-subtitle">All four pillars are implemented in <code>bot_data.py</code> and <code>run_bot.py</code></p>
+  </div>
+  <div class="overview-grid">
+    <div class="overview-card abs">
+      <div class="ov-icon">🔮</div>
+      <div class="ov-title" style="color:#a78bfa">Abstraction</div>
+      <div class="ov-desc">Hides complexity. Forces subclasses to implement <code>process_target()</code> through an abstract base class — <code>TargetingAction(ABC)</code>.</div>
+      <div class="ov-file">📄 bot_data.py · L4–L10</div>
+    </div>
+    <div class="overview-card inh">
+      <div class="ov-icon">🧬</div>
+      <div class="ov-title" style="color:#60a5fa">Inheritance</div>
+      <div class="ov-desc">Reuses code through hierarchy. <code>HashtagTargeter</code> and <code>AccountTargeter</code> both inherit from <code>TargetingAction</code>.</div>
+      <div class="ov-file">📄 bot_data.py · L13–L49</div>
+    </div>
+    <div class="overview-card pol">
+      <div class="ov-icon">🔄</div>
+      <div class="ov-title" style="color:#34d399">Polymorphism</div>
+      <div class="ov-desc">One interface, many forms. The same <code>targeter.process_target()</code> call produces different behavior at runtime depending on the subclass.</div>
+      <div class="ov-file">📄 run_bot.py · L80–L88</div>
+    </div>
+    <div class="overview-card enc">
+      <div class="ov-icon">🔒</div>
+      <div class="ov-title" style="color:#fbbf24">Encapsulation</div>
+      <div class="ov-desc">Protects data. <code>BotSession</code> uses private <code>__username</code>, <code>__password</code> fields and exposes them through validated getters/setters.</div>
+      <div class="ov-file">📄 bot_data.py · L51–L116</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 2: ABSTRACTION                          -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-2">
+  <div class="section-header">
+    <div class="section-label abs">🔮 Pillar 1 of 4</div>
+    <h2 class="section-title abs">Abstraction</h2>
+    <p class="section-subtitle">Hiding implementation details behind a strict interface contract</p>
+  </div>
+  <div class="two-col">
+    <div class="code-panel">
+      <div class="code-header">
+        <div class="code-dots">
+          <div class="code-dot code-dot-r"></div>
+          <div class="code-dot code-dot-y"></div>
+          <div class="code-dot code-dot-g"></div>
+        </div>
+        <span class="code-filename">bot_data.py — TargetingAction (Abstract Base Class)</span>
+      </div>
+      <div class="code-body"><pre><span class="cm"># Import the ABC tools from Python's standard library</span>
+<span class="kw">from</span> <span class="cl">abc</span> <span class="kw">import</span> <span class="fn">ABC</span>, <span class="fn">abstractmethod</span>
+
+
+<span class="highlight-line"><span class="kw">class</span> <span class="cl">TargetingAction</span>(<span class="fn">ABC</span>):</span>
+    <span class="st">""" Base class representing a targeting action (Abstraction) """</span>
+
+<span class="highlight-line">    <span class="dt">@abstractmethod</span></span>
+<span class="highlight-line">    <span class="kw">def</span> <span class="fn">process_target</span>(<span class="selfkw">self</span>, target_name):</span>
+        <span class="st">""" Process target name (abstract method) """</span>
+<span class="highlight-line">        <span class="kw">pass</span>    <span class="cm"># ← No implementation here!</span></span>
+
+
+<span class="cm"># ❌ This would FAIL — cannot instantiate abstract class:</span>
+<span class="cm"># action = TargetingAction()  # → TypeError!</span>
+
+<span class="cm"># ✅ Verified by unit test:</span>
+<span class="kw">with</span> <span class="fn">self</span>.assertRaises(<span class="cl">TypeError</span>):
+    <span class="cl">TargetingAction</span>()   <span class="cm"># → confirms abstraction enforced</span></pre></div>
+    </div>
+    <div class="info-panel">
+      <div class="info-card abs">
+        <div class="info-card-title">🔮 What is Abstraction?</div>
+        <div class="info-card-body">
+          Abstraction means exposing <strong>only what is necessary</strong> and hiding the internal details.
+          In Python, this is achieved using the <code>abc</code> module — <code>ABC</code> (Abstract Base Class) and
+          <code>@abstractmethod</code>.
+        </div>
+      </div>
+      <div class="info-card abs">
+        <div class="info-card-title">📌 In Botwizer</div>
+        <div class="info-card-body">
+          <code>TargetingAction</code> is the abstract base class. It <strong>declares</strong>
+          the method <code>process_target()</code> but does NOT implement it (<code>pass</code>).
+          Any class that inherits from it <strong>must</strong> override this method — otherwise Python will raise a <code>TypeError</code>.
+          <div class="tag-list">
+            <span class="tag abs">ABC</span>
+            <span class="tag abs">@abstractmethod</span>
+            <span class="tag abs">TargetingAction</span>
+            <span class="tag abs">process_target</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-card abs">
+        <div class="info-card-title">✅ Why It Matters</div>
+        <div class="info-card-body">
+          The caller of <code>process_target()</code> does not need to know <em>how</em>
+          it works — only <em>that</em> it works. This is the essence of abstraction:
+          <strong>define the "what", hide the "how"</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 3: INHERITANCE                          -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-3">
+  <div class="section-header">
+    <div class="section-label inh">🧬 Pillar 2 of 4</div>
+    <h2 class="section-title inh">Inheritance</h2>
+    <p class="section-subtitle">Building a class hierarchy to reuse code and share behavior</p>
+  </div>
+  <div class="two-col">
+    <div class="code-panel">
+      <div class="code-header">
+        <div class="code-dots">
+          <div class="code-dot code-dot-r"></div>
+          <div class="code-dot code-dot-y"></div>
+          <div class="code-dot code-dot-g"></div>
+        </div>
+        <span class="code-filename">bot_data.py — HashtagTargeter &amp; AccountTargeter (Subclasses)</span>
+      </div>
+      <div class="code-body"><pre><span class="cm"># HashtagTargeter inherits from TargetingAction</span>
+<span class="highlight-line"><span class="kw">class</span> <span class="cl">HashtagTargeter</span>(<span class="cl">TargetingAction</span>):</span>
+    <span class="st">""" Targets posts under a specific hashtag (Inheritance) """</span>
+
+    <span class="kw">def</span> <span class="fn">process_target</span>(<span class="selfkw">self</span>, target_name):
+        <span class="st">""" Polymorphic implementation for hashtag """</span>
+        <span class="kw">try</span>:
+            <span class="fn">print</span>(<span class="st">f"Searching hashtag: #{target_name}"</span>)
+            <span class="fn">print</span>(<span class="st">f"Liking most recent post"</span>)
+            <span class="kw">return</span> <span class="bl">True</span>
+        <span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> error:
+            <span class="kw">return</span> <span class="bl">False</span>
+
+
+<span class="cm"># AccountTargeter also inherits from TargetingAction</span>
+<span class="highlight-line"><span class="kw">class</span> <span class="cl">AccountTargeter</span>(<span class="cl">TargetingAction</span>):</span>
+    <span class="st">""" Targets posts of a specific account (Inheritance) """</span>
+
+    <span class="kw">def</span> <span class="fn">process_target</span>(<span class="selfkw">self</span>, target_name):
+        <span class="st">""" Polymorphic implementation for account """</span>
+        <span class="kw">try</span>:
+            <span class="fn">print</span>(<span class="st">f"Visiting profile: @{target_name}"</span>)
+            <span class="fn">print</span>(<span class="st">f"Following user: @{target_name}"</span>)
+            <span class="kw">return</span> <span class="bl">True</span>
+        <span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> error:
+            <span class="kw">return</span> <span class="bl">False</span>
+
+
+<span class="cm"># ✅ isinstance() confirms inheritance chain:</span>
+<span class="fn">isinstance</span>(HashtagTargeter(), <span class="cl">TargetingAction</span>)  <span class="cm"># → True</span>
+<span class="fn">isinstance</span>(AccountTargeter(), <span class="cl">TargetingAction</span>)  <span class="cm"># → True</span></pre></div>
+    </div>
+    <div class="info-panel">
+      <div class="info-card inh">
+        <div class="info-card-title">🧬 What is Inheritance?</div>
+        <div class="info-card-body">
+          Inheritance allows a class (child) to <strong>acquire properties and behaviors</strong>
+          from another class (parent), promoting code reuse and establishing an <strong>IS-A relationship</strong>.
+        </div>
+      </div>
+      <div class="info-card inh">
+        <div class="info-card-title">📌 In Botwizer — Hierarchy Diagram</div>
+        <div class="info-card-body" style="padding-top:8px;">
+          <div class="diagram-box" style="background:rgba(255,255,255,0.02); border:1px solid rgba(59,130,246,0.2); padding:18px;">
+            <div class="diag-class" style="border-color: rgba(139,92,246,0.5);">
+              <div class="diag-class-name" style="color:#a78bfa">TargetingAction</div>
+              <div class="diag-class-meta">«abstract» (ABC)</div>
+              <div class="diag-class-method">+ process_target(target_name) «abstract»</div>
+            </div>
+            <div class="diag-arrow"></div>
+            <div class="diag-row">
+              <div class="diag-branch">
+                <div class="diag-class" style="border-color: rgba(59,130,246,0.5); min-width:160px;">
+                  <div class="diag-class-name" style="color:#60a5fa; font-size:13px;">HashtagTargeter</div>
+                  <div class="diag-class-method" style="font-size:10px;">+ process_target() ← #hashtag</div>
+                </div>
+              </div>
+              <div class="diag-branch">
+                <div class="diag-class" style="border-color: rgba(59,130,246,0.5); min-width:160px;">
+                  <div class="diag-class-name" style="color:#60a5fa; font-size:13px;">AccountTargeter</div>
+                  <div class="diag-class-method" style="font-size:10px;">+ process_target() ← @account</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-card inh">
+        <div class="info-card-title">✅ Key Benefit</div>
+        <div class="info-card-body">
+          Both subclasses <strong>share the same type</strong> (<code>TargetingAction</code>) — proven by
+          <code>isinstance()</code> checks in the unit tests. This makes them interchangeable in the runner.
+          <div class="tag-list">
+            <span class="tag inh">HashtagTargeter</span>
+            <span class="tag inh">AccountTargeter</span>
+            <span class="tag inh">TargetingAction</span>
+            <span class="tag inh">IS-A relation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 4: POLYMORPHISM                         -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-4">
+  <div class="section-header">
+    <div class="section-label pol">🔄 Pillar 3 of 4</div>
+    <h2 class="section-title pol">Polymorphism</h2>
+    <p class="section-subtitle">One method call — many different behaviors depending on the runtime object</p>
+  </div>
+  <div class="two-col">
+    <div class="code-panel">
+      <div class="code-header">
+        <div class="code-dots">
+          <div class="code-dot code-dot-r"></div>
+          <div class="code-dot code-dot-y"></div>
+          <div class="code-dot code-dot-g"></div>
+        </div>
+        <span class="code-filename">run_bot.py — Polymorphic dispatch (L71–L88)</span>
+      </div>
+      <div class="code-body"><pre><span class="cm"># STEP 1: Instantiate the correct subclass based on user input</span>
+<span class="kw">if</span> <span class="selfkw">self</span>.target_type == <span class="st">"1"</span>:
+<span class="highlight-line">    targeter = <span class="cl">HashtagTargeter</span>()     <span class="cm"># ← assigned at runtime</span></span>
+    <span class="fn">print</span>(<span class="st">"Initializing hashtag automation..."</span>)
+<span class="kw">else</span>:
+<span class="highlight-line">    targeter = <span class="cl">AccountTargeter</span>()     <span class="cm"># ← or this one</span></span>
+    <span class="fn">print</span>(<span class="st">"Initializing account automation..."</span>)
+
+
+<span class="cm"># STEP 2: The SAME call works for BOTH subclasses ✨</span>
+<span class="fn">print</span>(<span class="st">"--- Processing Targets ---"</span>)
+<span class="kw">for</span> target_item <span class="kw">in</span> <span class="selfkw">self</span>.session.get_targets():
+    <span class="fn">print</span>(<span class="st">f"Processing target: {target_item}"</span>)
+
+<span class="highlight-line">    success = targeter.process_target(target_item) <span class="cm"># ← polymorphic!</span></span>
+
+    <span class="kw">if</span> success:
+        <span class="fn">print</span>(<span class="st">f"✅ Processed: {target_item}"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">f"❌ Failed: {target_item}"</span>)
+
+
+<span class="cm"># RESULT: Same line of code → different behavior:</span>
+<span class="cm"># HashtagTargeter → prints "Searching hashtag page: #python"</span>
+<span class="cm"># AccountTargeter → prints "Visiting user account: @jack"</span></pre></div>
+    </div>
+    <div class="info-panel">
+      <div class="info-card pol">
+        <div class="info-card-title">🔄 What is Polymorphism?</div>
+        <div class="info-card-body">
+          <strong>"Poly"</strong> = many, <strong>"morph"</strong> = form.
+          Polymorphism allows one interface to be used for a general class of actions.
+          The specific action is determined at <strong>runtime</strong>, not compile time.
+        </div>
+      </div>
+      <div class="info-card pol">
+        <div class="info-card-title">📌 In Botwizer</div>
+        <div class="info-card-body">
+          The key line is: <code>targeter.process_target(target_item)</code><br/><br/>
+          The variable <code>targeter</code> can be either a <code>HashtagTargeter</code> or an <code>AccountTargeter</code>
+          depending on user input. The <strong>same line of code</strong> produces completely different output at runtime.
+          <div class="tag-list">
+            <span class="tag pol">runtime dispatch</span>
+            <span class="tag pol">process_target()</span>
+            <span class="tag pol">override</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-card pol">
+        <div class="info-card-title">✅ Verified by Test</div>
+        <div class="info-card-body">
+          <code>test_inheritance_and_polymorphism()</code> in the unit test file calls <code>process_target()</code>
+          on both subclasses and asserts both return <code>True</code> — confirming the polymorphic
+          behavior works correctly with different internal implementations.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 5: ENCAPSULATION                        -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-5">
+  <div class="section-header">
+    <div class="section-label enc">🔒 Pillar 4 of 4</div>
+    <h2 class="section-title enc">Encapsulation</h2>
+    <p class="section-subtitle">Protecting internal data from unauthorized access using private fields and validated accessors</p>
+  </div>
+  <div class="two-col">
+    <div class="code-panel">
+      <div class="code-header">
+        <div class="code-dots">
+          <div class="code-dot code-dot-r"></div>
+          <div class="code-dot code-dot-y"></div>
+          <div class="code-dot code-dot-g"></div>
+        </div>
+        <span class="code-filename">bot_data.py — BotSession (Encapsulation)</span>
+      </div>
+      <div class="code-body"><pre><span class="kw">class</span> <span class="cl">BotSession</span>:
+    <span class="st">""" Manages user session and targets (Encapsulation) """</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="selfkw">self</span>):
+        <span class="cm"># Private attributes — double underscore = name mangled</span>
+<span class="highlight-line">        <span class="selfkw">self</span>.__username = <span class="st">""</span>     <span class="cm"># ← can't access from outside!</span></span>
+<span class="highlight-line">        <span class="selfkw">self</span>.__password = <span class="st">""</span>     <span class="cm"># ← protected by Python</span></span>
+<span class="highlight-line">        <span class="selfkw">self</span>.__targets  = []     <span class="cm"># ← not directly modifiable</span></span>
+<span class="highlight-line">        <span class="selfkw">self</span>.__comments = []</span>
+
+    <span class="cm"># ── GETTER (read access) ──────────────────────</span>
+    <span class="kw">def</span> <span class="fn">get_username</span>(<span class="selfkw">self</span>):
+        <span class="kw">return</span> <span class="selfkw">self</span>.__username
+
+    <span class="cm"># ── SETTER (validated write access) ──────────</span>
+    <span class="kw">def</span> <span class="fn">set_username</span>(<span class="selfkw">self</span>, username_value):
+        <span class="kw">try</span>:
+<span class="highlight-line">            <span class="kw">if</span> <span class="kw">not</span> username_value <span class="kw">or</span> <span class="fn">len</span>(username_value.strip()) == <span class="nm">0</span>:</span>
+<span class="highlight-line">                <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">"Username cannot be empty"</span>)</span>
+            <span class="selfkw">self</span>.__username = username_value.strip()
+        <span class="kw">except</span> <span class="cl">ValueError</span> <span class="kw">as</span> error:
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Invalid username: {error}"</span>)
+
+    <span class="kw">def</span> <span class="fn">set_password</span>(<span class="selfkw">self</span>, password_value):
+        <span class="kw">try</span>:
+<span class="highlight-line">            <span class="kw">if</span> <span class="fn">len</span>(password_value.strip()) &lt; <span class="nm">6</span>:    <span class="cm"># ← validation!</span></span>
+<span class="highlight-line">                <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">"Password ≥ 6 chars"</span>)</span>
+            <span class="selfkw">self</span>.__password = password_value.strip()
+        <span class="kw">except</span> <span class="cl">ValueError</span> <span class="kw">as</span> error:
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Invalid password: {error}"</span>)</pre></div>
+    </div>
+    <div class="info-panel">
+      <div class="info-card enc">
+        <div class="info-card-title">🔒 What is Encapsulation?</div>
+        <div class="info-card-body">
+          Encapsulation bundles <strong>data and behavior</strong> into a class and
+          <strong>restricts direct access</strong> to internal state. Only designated
+          methods (getters/setters) can interact with private data.
+        </div>
+      </div>
+      <div class="info-card enc">
+        <div class="info-card-title">📌 In Botwizer — Private Fields</div>
+        <div class="info-card-body">
+          <code>BotSession</code> uses Python's <strong>double underscore name mangling</strong>:
+          <ul style="margin-top:6px; padding-left:16px; line-height:2;">
+            <li><code>__username</code> → mangled to <code>_BotSession__username</code></li>
+            <li><code>__password</code> → validates min 6 chars in setter</li>
+            <li><code>__targets</code> → only addable via <code>add_target()</code></li>
+            <li><code>__comments</code> → only addable via <code>add_comment()</code></li>
+          </ul>
+          <div class="tag-list">
+            <span class="tag enc">__private</span>
+            <span class="tag enc">getter</span>
+            <span class="tag enc">setter</span>
+            <span class="tag enc">validation</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-card enc">
+        <div class="info-card-title">✅ What Happens if You Bypass It?</div>
+        <div class="info-card-body">
+          <code>session.__password</code> → <strong>AttributeError</strong>!
+          You can only use <code>session.get_password()</code> to read and
+          <code>session.set_password("secure123")</code> to write — with full validation.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 6: UNIT TESTS                           -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-6">
+  <div class="section-header">
+    <div class="section-label pol">🧪 Verification</div>
+    <h2 class="section-title pol">Unit Tests — Proving OOP Works</h2>
+    <p class="section-subtitle">All four OOP pillars are verified through automated unit tests</p>
+  </div>
+  <div class="two-col">
+    <div class="code-panel">
+      <div class="code-header">
+        <div class="code-dots">
+          <div class="code-dot code-dot-r"></div>
+          <div class="code-dot code-dot-y"></div>
+          <div class="code-dot code-dot-g"></div>
+        </div>
+        <span class="code-filename">test_oop_implementation.py</span>
+      </div>
+      <div class="code-body"><pre><span class="kw">import</span> unittest
+<span class="kw">from</span> botwizer_automation.bot_data <span class="kw">import</span> (
+    BotSession, HashtagTargeter, AccountTargeter, TargetingAction
+)
+
+
+<span class="kw">class</span> <span class="cl">TestOopAutomation</span>(unittest.TestCase):
+
+    <span class="cm"># ── Test: ABSTRACTION ─────────────────────</span>
+<span class="highlight-line">    <span class="kw">def</span> <span class="fn">test_abstraction</span>(<span class="selfkw">self</span>):</span>
+        <span class="cm"># Cannot instantiate abstract class directly</span>
+        <span class="kw">with</span> <span class="selfkw">self</span>.assertRaises(<span class="cl">TypeError</span>):
+<span class="highlight-line">            <span class="cl">TargetingAction</span>()   <span class="cm"># → MUST raise TypeError ✅</span></span>
+
+    <span class="cm"># ── Test: INHERITANCE + POLYMORPHISM ──────</span>
+<span class="highlight-line">    <span class="kw">def</span> <span class="fn">test_inheritance_and_polymorphism</span>(<span class="selfkw">self</span>):</span>
+        hashtag = <span class="cl">HashtagTargeter</span>()
+        account = <span class="cl">AccountTargeter</span>()
+        <span class="cm"># Verify inheritance chain</span>
+<span class="highlight-line">        <span class="selfkw">self</span>.assertTrue(<span class="fn">isinstance</span>(hashtag, <span class="cl">TargetingAction</span>))  <span class="cm"># ✅</span></span>
+<span class="highlight-line">        <span class="selfkw">self</span>.assertTrue(<span class="fn">isinstance</span>(account, <span class="cl">TargetingAction</span>))  <span class="cm"># ✅</span></span>
+        <span class="cm"># Verify polymorphic behavior returns True</span>
+<span class="highlight-line">        <span class="selfkw">self</span>.assertTrue(hashtag.process_target(<span class="st">"coding"</span>))      <span class="cm"># ✅</span></span>
+<span class="highlight-line">        <span class="selfkw">self</span>.assertTrue(account.process_target(<span class="st">"jack_coder"</span>))  <span class="cm"># ✅</span></span>
+
+    <span class="cm"># ── Test: ENCAPSULATION ───────────────────</span>
+<span class="highlight-line">    <span class="kw">def</span> <span class="fn">test_encapsulation_password</span>(<span class="selfkw">self</span>):</span>
+        session = <span class="cl">BotSession</span>()
+        session.set_password(<span class="st">"mypassword123"</span>)  <span class="cm"># valid ✅</span>
+<span class="highlight-line">        <span class="selfkw">self</span>.assertEqual(session.get_password(), <span class="st">"mypassword123"</span>)</span>
+        <span class="kw">with</span> <span class="selfkw">self</span>.assertRaises(<span class="cl">ValueError</span>):
+<span class="highlight-line">            session.set_password(<span class="st">"12345"</span>)    <span class="cm"># too short → ValueError ✅</span></span></pre></div>
+    </div>
+    <div class="info-panel">
+      <div class="info-card pol">
+        <div class="info-card-title">🧪 What the Tests Prove</div>
+        <div class="info-card-body">
+          <ul style="padding-left:16px; line-height:2.1;">
+            <li><strong>Abstraction</strong>: <code>TargetingAction()</code> raises <code>TypeError</code></li>
+            <li><strong>Inheritance</strong>: <code>isinstance(hashtag, TargetingAction) == True</code></li>
+            <li><strong>Polymorphism</strong>: Both subclasses return <code>True</code> from same method signature</li>
+            <li><strong>Encapsulation</strong>: Short password raises <code>ValueError</code></li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card pol">
+        <div class="info-card-title">▶️ How to Run the Tests</div>
+        <div class="info-card-body">
+          <code style="display:block; background: rgba(0,0,0,0.4); padding:10px; border-radius:8px; line-height:1.8; font-size:12px;">
+            # Navigate to oop_demo folder<br/>
+            cd oop_demo<br/><br/>
+            # Run the unit test suite<br/>
+            python -m unittest test_oop_implementation.py<br/><br/>
+            # Expected output:<br/>
+            ....  # 4 dots = 4 tests passed ✅<br/>
+            Ran 4 tests in 0.00xs<br/>
+            OK
+          </code>
+        </div>
+      </div>
+      <div class="info-card pol">
+        <div class="info-card-title">📊 Test Coverage</div>
+        <div class="info-card-body">
+          4 test methods covering all 4 OOP pillars.
+          Tests are standard library <code>unittest</code> — no external dependencies required.
+          <div class="tag-list">
+            <span class="tag pol">test_abstraction</span>
+            <span class="tag pol">test_encapsulation_username</span>
+            <span class="tag pol">test_encapsulation_password</span>
+            <span class="tag pol">test_inheritance_and_polymorphism</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SLIDE 7: SUMMARY                              -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-7">
+  <div class="section-header">
+    <div class="section-label inh">🎓 Final Summary</div>
+    <h2 class="section-title inh">OOP Pillars at a Glance</h2>
+    <p class="section-subtitle">All four pillars implemented in <code>oop_demo/botwizer_automation/</code></p>
+  </div>
+  <div class="summary-grid">
+    <div class="summary-card abs">
+      <div class="summary-icon">🔮</div>
+      <div class="summary-name" style="color:#a78bfa">Abstraction</div>
+      <div class="info-card-body" style="font-size:12px; text-align:left;">
+        <code>TargetingAction(ABC)</code> is an abstract base class. It declares <code>@abstractmethod process_target()</code>
+        but never implements it — forcing all subclasses to define their own version.
+        Hides complexity; exposes only the interface.
+      </div>
+      <div class="summary-key">TargetingAction · @abstractmethod</div>
+    </div>
+    <div class="summary-card inh">
+      <div class="summary-icon">🧬</div>
+      <div class="summary-name" style="color:#60a5fa">Inheritance</div>
+      <div class="info-card-body" style="font-size:12px; text-align:left;">
+        <code>HashtagTargeter(TargetingAction)</code> and <code>AccountTargeter(TargetingAction)</code> are
+        subclasses that inherit the type and contract of the base. Both are confirmed as
+        <code>TargetingAction</code> instances.
+      </div>
+      <div class="summary-key">HashtagTargeter · AccountTargeter</div>
+    </div>
+    <div class="summary-card pol">
+      <div class="summary-icon">🔄</div>
+      <div class="summary-name" style="color:#34d399">Polymorphism</div>
+      <div class="info-card-body" style="font-size:12px; text-align:left;">
+        In <code>run_bot.py</code>, the single call <code>targeter.process_target(target_item)</code>
+        behaves differently at runtime — printing hashtag searches <em>or</em> profile visits —
+        without the runner knowing which subclass it's calling.
+      </div>
+      <div class="summary-key">runtime dispatch · process_target()</div>
+    </div>
+    <div class="summary-card enc">
+      <div class="summary-icon">🔒</div>
+      <div class="summary-name" style="color:#fbbf24">Encapsulation</div>
+      <div class="info-card-body" style="font-size:12px; text-align:left;">
+        <code>BotSession</code> stores <code>__username</code>, <code>__password</code>, <code>__targets</code>,
+        and <code>__comments</code> as private. External code <em>must</em> use getters/setters
+        which include validation logic (e.g., password ≥ 6 chars).
+      </div>
+      <div class="summary-key">BotSession · __private · getters/setters</div>
+    </div>
+  </div>
+  <div style="margin-top:28px; text-align:center; font-size:13px; color:var(--text-muted);">
+    <span>📂 <strong style="color:var(--text-secondary)">Repository:</strong> </span>
+    <a href="https://github.com/TechyElle/botwizer" target="_blank" style="color:var(--accent-blue); text-decoration:none;">github.com/TechyElle/botwizer</a>
+    <span style="margin:0 12px; opacity:0.3;">|</span>
+    <span>📦 <strong style="color:var(--text-secondary)">Original:</strong> </span>
+    <a href="https://github.com/DevGlitch/botwizer" target="_blank" style="color:var(--accent-cyan); text-decoration:none;">github.com/DevGlitch/botwizer</a>
+    <span style="margin:0 12px; opacity:0.3;">|</span>
+    <span style="color:var(--accent-green);">✅ 4/4 Pillars Implemented</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- NAVIGATION BAR                                -->
+<!-- ══════════════════════════════════════════════ -->
+<nav class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" disabled>← Prev</button>
+  <div class="dot-nav" id="dotNav"></div>
+  <span class="slide-counter" id="slideCounter">1 / 8</span>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+</nav>
+
+<script>
+  const TOTAL_SLIDES = 8;
+  let current = 0;
+
+  const slides = document.querySelectorAll('.slide');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const counter = document.getElementById('slideCounter');
+  const progressBar = document.getElementById('progressBar');
+  const dotNav = document.getElementById('dotNav');
+
+  // Build dots
+  for (let i = 0; i < TOTAL_SLIDES; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    dotNav.appendChild(dot);
+  }
+
+  function updateUI() {
+    counter.textContent = `${current + 1} / ${TOTAL_SLIDES}`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === TOTAL_SLIDES - 1;
+    progressBar.style.width = ((current + 1) / TOTAL_SLIDES * 100) + '%';
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= TOTAL_SLIDES) return;
+    const direction = idx > current ? 1 : -1;
+    slides[current].classList.remove('active');
+    slides[current].classList.add(direction > 0 ? 'exit-left' : '');
+    setTimeout(() => slides[current - direction].classList.remove('exit-left'), 500);
+    current = idx;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  function changeSlide(dir) {
+    goTo(current + dir);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
